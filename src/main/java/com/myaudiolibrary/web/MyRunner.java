@@ -23,7 +23,7 @@ public class MyRunner implements CommandLineRunner {
         // Faire des tests
         Optional<Artist> artist = artistRepository.findById(1);
         if(artist.isEmpty()){
-            System.out.println("Employe inexistant");
+            System.out.println("Artiste inexistant");
         } else {
             Artist e = artist.get();
             System.out.println(e.toString());
