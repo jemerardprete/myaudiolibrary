@@ -95,7 +95,7 @@ public class ArtistController {
         return artistRepository.save(artist);
     }
 
-    // 7 - Suppression d'un artiste (gérer la suppression en cascade !!!)
+    // 6 - Suppression d'un artiste avec suppression en cascade
     // équivalent de @RequestMapping(method = RequestMethod.DELETE)
     @DeleteMapping(value = "/{id}") // Pas de consumes ou de produces pour le delete
     @ResponseStatus(HttpStatus.NO_CONTENT) // Retourne 204

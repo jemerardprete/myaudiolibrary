@@ -15,7 +15,7 @@ public class Album {
     @Column(name = "Title")
     private String title;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ArtistId", nullable = false)
     private Artist artist;
 

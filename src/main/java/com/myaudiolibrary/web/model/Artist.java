@@ -19,7 +19,7 @@ public class Artist {
     private String name;
 
     @JsonIgnoreProperties("artist")
-    @OneToMany(mappedBy = "artist", fetch = FetchType.EAGER) // cascade = ...
+    @OneToMany(mappedBy = "artist", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private Set<Album> albums;
 
     public Integer getId() {
