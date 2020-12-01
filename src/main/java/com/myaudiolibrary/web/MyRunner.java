@@ -31,12 +31,5 @@ public class MyRunner implements CommandLineRunner {
             System.out.println(e.toString());
         }
 
-        System.out.println("Afficher artiste ayant le nom Aerosmith : ");
-        Artist e = artistRepository.findByName("aerosmith");
-        if(e != null){
-            System.out.println(e.toString());
-        } else {
-            System.out.println("Artiste non trouvé");
-        }
     }
 }

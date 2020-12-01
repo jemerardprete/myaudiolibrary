@@ -19,7 +19,7 @@ public class AlbumController {
     @Autowired
     private AlbumRepository albumRepository;
 
-    // 7- Ajout d'un album à un artiste (gérer erreurs 404 et les 409 en cas d'album déjà existant).
+    // 7- Ajout d'un album à un artiste
     @RequestMapping(method = RequestMethod.POST, value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Album addAlbum(@RequestBody Album album){

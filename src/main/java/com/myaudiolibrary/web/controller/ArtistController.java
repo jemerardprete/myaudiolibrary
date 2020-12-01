@@ -42,13 +42,14 @@ public class ArtistController {
     }
 
     // 2 - Recherche par nom
-    @RequestMapping(method = RequestMethod.GET, value = "", params = {"name"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Artist searchByName(@RequestParam String name){
-        Artist artist = artistRepository.findByName(name);
-        if (artist == null){
-            throw new EntityNotFoundException("L'artiste nommé " + name + " n'a pas été trouvé");
-        }
-        return artist;
+    @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json", params = {"name", "page", "size", "sortProperty", "sortDirection"})
+    public Page<Artist> searchByName(@RequestParam (value = "name") String name,
+                                     @RequestParam (value = "page", defaultValue = "0") Integer page,
+                                     @RequestParam (value = "size", defaultValue = "10") Integer size,
+                                     @RequestParam (value = "sortProperty") String sortProperty,
+                                     @RequestParam (value = "sortDirection") String sortDirection){
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty);
+        return artistRepository.findByNameContaining(name, pageRequest);
     }
 
     // 3 - Afficher la liste des artistes
@@ -73,7 +74,7 @@ public class ArtistController {
         return artistRepository.findAll(PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty));
     }
 
-    // 4 - Création d'un artiste (gestion de l'erreur 409 s'il existe déjà un artiste de même nom)
+    // 4 - Création d'un artiste
     @RequestMapping(method = RequestMethod.POST, value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     // Retourne 201 au lieu de 200
     @ResponseStatus(HttpStatus.CREATED)
@@ -91,6 +92,9 @@ public class ArtistController {
     public Artist updateArtist(@PathVariable Integer id, @RequestBody Artist artist){
         if(!artistRepository.existsById(id)){
             throw new EntityNotFoundException("L'artiste d'identifiant " + id + " n'a pas été trouvé");
+        }
+        if(artistRepository.findByName(artist.getName()) != null){
+            throw new EntityExistsException("Il existe déjà un artiste nommé " + artist.getName());
         }
         return artistRepository.save(artist);
     }

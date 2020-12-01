@@ -19,6 +19,15 @@ public class Album {
     @JoinColumn(name = "ArtistId", nullable = false)
     private Artist artist;
 
+    public Album() {
+    }
+
+    public Album(Integer id, String title, Artist artist) {
+        this.id = id;
+        this.title = title;
+        this.artist = artist;
+    }
+
     public Integer getId() {
         return id;
     }

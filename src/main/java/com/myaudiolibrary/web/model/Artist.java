@@ -22,6 +22,16 @@ public class Artist {
     @OneToMany(mappedBy = "artist", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private Set<Album> albums;
 
+    public Artist() {
+
+    }
+
+    public Artist(Integer id, String name, Set<Album> albums) {
+        this.id = id;
+        this.name = name;
+        this.albums = albums;
+    }
+
     public Integer getId() {
         return id;
     }
