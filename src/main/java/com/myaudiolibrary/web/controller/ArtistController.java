@@ -6,108 +6,57 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
-// Controller permettant de créer du contenu dans des chemins spécifiques
 @CrossOrigin
-@RestController
+@Controller
 @RequestMapping("/artists")
 public class ArtistController {
-
-    // Appel du fichier où se trouve les requêtes SQL souhaitées
     @Autowired
     private ArtistRepository artistRepository;
 
-    // http://localhost:5366/artists
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = "text/plain")
-    public String hello(){
-        return "Hello World!";
-    }
-
-    // - 1. Afficher un artiste
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Artist getArtist(@PathVariable(value = "id") Integer id){
-        Optional<Artist> optionalArtist = artistRepository.findById(id);
-        if(!optionalArtist.isPresent()) {
-            // Erreur 404
-            throw new EntityNotFoundException("L'artiste d'identifiant " + id + " n'a pas été trouvé");
+    // Affichage d'un artiste
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public String getArtistById(@PathVariable Integer id, final ModelMap model) {
+        Optional<Artist> artistOptional = artistRepository.findById(id);
+        // Gérer erreur 404
+        if(artistOptional.isEmpty()){
+            throw new EntityNotFoundException("L'artiste d'identifiant " + id + " n'a pas été trouvé !");
         }
-        return optionalArtist.get();
+        model.put("artist", artistOptional.get());
+        return "detailArtist";
     }
 
-    // 2 - Recherche par nom
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json", params = {"name", "page", "size", "sortProperty", "sortDirection"})
-    public Page<Artist> searchByName(@RequestParam (value = "name") String name,
-                                     @RequestParam (value = "page", defaultValue = "0") Integer page,
-                                     @RequestParam (value = "size", defaultValue = "10") Integer size,
-                                     @RequestParam (value = "sortProperty") String sortProperty,
-                                     @RequestParam (value = "sortDirection") String sortDirection){
+    // Recherche par nom
+    @RequestMapping(value = "", params = "name", method = RequestMethod.GET)
+    public String searchByName(@RequestParam String name, final ModelMap model) {
+        Artist artist = artistRepository.findByName(name);
+        // Gérer erreur 404
+        model.put("artist", artist);
+        return "detailArtist";
+    }
+
+    // Liste des artistes
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public String listArtists(final ModelMap model,
+                               @RequestParam(defaultValue = "0") Integer page,
+                               @RequestParam(defaultValue = "10") Integer size,
+                               @RequestParam(defaultValue = "ASC") String sortDirection,
+                               @RequestParam(defaultValue = "name") String sortProperty) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty);
-        return artistRepository.findByNameContaining(name, pageRequest);
-    }
-
-    // 3 - Afficher la liste des artistes
-    @RequestMapping(method = RequestMethod.GET, value = "", produces = MediaType.APPLICATION_JSON_VALUE, params = {"page", "size", "sortProperty", "sortDirection"})
-    public Page<Artist> listeArtists(
-            // Paramètres passés dans l'URL
-            @RequestParam Integer page,
-            @RequestParam Integer size,
-            @RequestParam String sortProperty,
-            @RequestParam String sortDirection
-    ){
-        if (page < 0) {
-            // Erreur 400
-            throw new IllegalArgumentException("Le paramètre page doit être positif ou nul !");
-        }
-        if (size <= 0 || size > 50) {
-            throw new IllegalArgumentException("Le paramètre size doit être compris entre 0 et 50 !");
-        }
-        if(!"ASC".equalsIgnoreCase(sortDirection) && !"DESC".equalsIgnoreCase(sortDirection)){
-            throw new IllegalArgumentException("Le paramètre sortDirection doit valoir ASC ou DESC");
-        }
-        return artistRepository.findAll(PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty));
-    }
-
-    // 4 - Création d'un artiste
-    @RequestMapping(method = RequestMethod.POST, value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    // Retourne 201 au lieu de 200
-    @ResponseStatus(HttpStatus.CREATED)
-    // @RequestBody = envoi de données complexes (ex : création d'un objet)
-    public Artist createArtist(@RequestBody Artist artist){
-        if(artistRepository.findByName(artist.getName()) != null){
-            throw new EntityExistsException("Il existe déjà un artiste nommé " + artist.getName());
-        }
-        return artistRepository.save(artist);
-    }
-
-    // 5 - Modification d'un artiste
-    // équivalent de @RequestMapping(method = RequestMethod.PUT)
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Artist updateArtist(@PathVariable Integer id, @RequestBody Artist artist){
-        if(!artistRepository.existsById(id)){
-            throw new EntityNotFoundException("L'artiste d'identifiant " + id + " n'a pas été trouvé");
-        }
-        if(artistRepository.findByName(artist.getName()) != null){
-            throw new EntityExistsException("Il existe déjà un artiste nommé " + artist.getName());
-        }
-        return artistRepository.save(artist);
-    }
-
-    // 6 - Suppression d'un artiste avec suppression en cascade
-    // équivalent de @RequestMapping(method = RequestMethod.DELETE)
-    @DeleteMapping(value = "/{id}") // Pas de consumes ou de produces pour le delete
-    @ResponseStatus(HttpStatus.NO_CONTENT) // Retourne 204
-    public void deleteArtist(@PathVariable Integer id){
-        if(!artistRepository.existsById(id)){
-            throw new EntityNotFoundException("L'artiste d'identifiant " + id + " n'a pas été trouvé");
-        }
-        artistRepository.deleteById(id);
+        Page<Artist> pageArtist = artistRepository.findAll(pageRequest);
+        model.put("artistes", pageArtist);
+        model.put("pageNumber", page + 1);
+        model.put("previousPage", page - 1);
+        model.put("nextPage", page + 1);
+        model.put("start", page * size + 1);
+        model.put ("end", (page) * size + pageArtist.getNumberOfElements());
+        return "listeArtists";
     }
 
 }
