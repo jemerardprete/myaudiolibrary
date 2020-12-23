@@ -42,6 +42,7 @@ public class ArtistController {
         model.put("artist", artist);
         return "detailArtist";
     }
+
     /*@RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json", params = {"name", "page", "size", "sortProperty", "sortDirection"})
     public Page<Artist> searchByName(@RequestParam (value = "name") String name,
                                      @RequestParam (value = "page", defaultValue = "0") Integer page,
@@ -70,7 +71,14 @@ public class ArtistController {
         return "listeArtists";
     }
 
-    // REVOIR CREATION, MODIFICATION, SUPPRESSION + GESTION ERREUR
+    // REVOIR CREATION, MODIFICATION + GESTION ERREUR
+    // LA SUPPRESSION D'UN ARTISTE FONCTIONNE
+
+    @RequestMapping(method= RequestMethod.GET, value = "/new")
+    public String newArtist(final ModelMap model){
+        model.put("artist", new Artist());
+        return "detailArtist";
+    }
 
     // Création et modification d'un artiste
     @RequestMapping(method = RequestMethod.POST, value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

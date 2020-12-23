@@ -8,8 +8,8 @@
 
     <div class="container">
         <h2>Détail de l'artiste <span th:text="${artist.name}">AC/DC</span></h2>
-
-        <div class="row">
+        <form id="saveForm" th:action="'/artists'" method="post" class="row">
+            <input type="hidden" th:value="${artist.id}" name="id">
             <div class="col-lg-12">
                 <div class="form-group">
                     <label for="name" class="form-control-label">Nom</label>
@@ -40,11 +40,11 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
         <div class="row">
             <!-- Gérer enregistrement et suppression ! -->
-            <button disabled="" class="btn btn-primary">Enregistrer</button>
-            <button class="btn btn-danger" th:href="'/artists/'+${artist.id}+'/delete'">Supprimer</button>
+            <input form="saveForm" class="btn btn-primary" type="submit" value="Enregistrer">
+            <a class="btn btn-danger" th:href="'/artists/'+${artist.id}+'/delete'">Supprimer</a>
         </div>
     </div>
 </div>
