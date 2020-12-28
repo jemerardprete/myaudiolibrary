@@ -36,9 +36,8 @@ public class ArtistController {
 
     // Recherche par nom
     @RequestMapping(value = "", params = "name", method = RequestMethod.GET)
-    public String searchByName(@RequestParam String name, final ModelMap model) {
+    public String searchByName(final ModelMap model, @RequestParam (value = "name") String name) {
         Artist artist = artistRepository.findByName(name);
-        // Gérer erreur 404
         model.put("artist", artist);
         return "detailArtist";
     }
@@ -71,8 +70,8 @@ public class ArtistController {
         return "listeArtists";
     }
 
-    // REVOIR CREATION, MODIFICATION + GESTION ERREUR
-    // LA SUPPRESSION D'UN ARTISTE FONCTIONNE
+    // CREATION, MODIFICATION & SUPPRESSION
+    // VOIR GESTION DES ERREURS
 
     @RequestMapping(method= RequestMethod.GET, value = "/new")
     public String newArtist(final ModelMap model){
@@ -91,6 +90,16 @@ public class ArtistController {
         artist = artistRepository.save(artist);
         return new RedirectView("/artists/" + artist.getId());
     }
+
+    /* Création d'un nouvel album
+    @RequestMapping(value = "/{id}/albums", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public RedirectView newAlbum(Album album, @PathVariable Integer id){
+        Album albumToArtist = new Album();
+        albumToArtist.setTitle(album.getTitle());
+        albumToArtist.setArtist(artistRepository.getOne(id));
+        albumRepository.save(albumToArtist);
+        return new RedirectView("/artists/" + album.getArtist().getId());
+    } */
 
     // Suppression => Rediriger vers la liste des artistes
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/delete")
