@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface ArtistRepository extends JpaRepository<Artist, Integer> {
     Artist findByName(String name);
-    Page<Artist> findByNameContaining(String name, Pageable pageable);
+    Page<Artist> findAllByNameContaining(String name, Pageable pageable);
 }

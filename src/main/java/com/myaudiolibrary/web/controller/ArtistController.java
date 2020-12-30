@@ -35,25 +35,29 @@ public class ArtistController {
     }
 
     // Recherche par nom
-    @RequestMapping(value = "", params = "name", method = RequestMethod.GET)
-    public String searchByName(final ModelMap model, @RequestParam (value = "name") String name) {
-        Artist artist = artistRepository.findByName(name);
-        model.put("artist", artist);
-        return "detailArtist";
+    @GetMapping(params = "name")
+    public String searchByName(final ModelMap model, @RequestParam("name") String name,
+                                                     @RequestParam(value="page", defaultValue = "0") Integer page,
+                                                     @RequestParam(value="size", defaultValue = "10") Integer size,
+                                                     @RequestParam(value="sortDirection", defaultValue = "ASC") String sortDirection,
+                                                     @RequestParam(value="sortProperty", defaultValue = "name") String sortProperty) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty);
+        Page<Artist> pageArtist = artistRepository.findAllByNameContaining(name, pageRequest);
+        model.put("artists", pageArtist);
+        model.put("sortDirection", sortDirection);
+        model.put("sortProperty", sortProperty);
+        model.put("size", size);
+        model.put("name", name);
+        model.put("pageNumber", page);
+        model.put("previousPage", page - 1);
+        model.put("nextPage", page + 1);
+        model.put("start", page * size + 1);
+        model.put ("end", (page) * size + pageArtist.getNumberOfElements());
+        return "listeArtists";
     }
 
-    /*@RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json", params = {"name", "page", "size", "sortProperty", "sortDirection"})
-    public Page<Artist> searchByName(@RequestParam (value = "name") String name,
-                                     @RequestParam (value = "page", defaultValue = "0") Integer page,
-                                     @RequestParam (value = "size", defaultValue = "10") Integer size,
-                                     @RequestParam (value = "sortProperty") String sortProperty,
-                                     @RequestParam (value = "sortDirection") String sortDirection){
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty);
-        return artistRepository.findByNameContaining(name, pageRequest);
-    }*/
-
     // Liste des artistes
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping()
     public String listArtists(final ModelMap model,
                                @RequestParam(defaultValue = "0") Integer page,
                                @RequestParam(defaultValue = "10") Integer size,
@@ -62,7 +66,10 @@ public class ArtistController {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(sortDirection), sortProperty);
         Page<Artist> pageArtist = artistRepository.findAll(pageRequest);
         model.put("artists", pageArtist);
-        model.put("pageNumber", page + 1);
+        model.put("sortDirection", sortDirection);
+        model.put("sortProperty", sortProperty);
+        model.put("size", size);
+        model.put("pageNumber", page);
         model.put("previousPage", page - 1);
         model.put("nextPage", page + 1);
         model.put("start", page * size + 1);
@@ -90,16 +97,6 @@ public class ArtistController {
         artist = artistRepository.save(artist);
         return new RedirectView("/artists/" + artist.getId());
     }
-
-    /* Création d'un nouvel album
-    @RequestMapping(value = "/{id}/albums", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView newAlbum(Album album, @PathVariable Integer id){
-        Album albumToArtist = new Album();
-        albumToArtist.setTitle(album.getTitle());
-        albumToArtist.setArtist(artistRepository.getOne(id));
-        albumRepository.save(albumToArtist);
-        return new RedirectView("/artists/" + album.getArtist().getId());
-    } */
 
     // Suppression => Rediriger vers la liste des artistes
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/delete")

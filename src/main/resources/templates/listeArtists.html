@@ -12,13 +12,13 @@
                 <h1>Liste des artistes</h1>
                 <a href="http://localhost:8080/artists/new" class="btn btn-primary">Nouvel artiste</a>
                 <table class="table table-hover table-striped">
-                    <thead th:switch="${param.sortDirection.toString()}" th:if="${param.sortProperty.toString()} == 'name'">
+                    <thead th:switch="${sortDirection.toString()}" th:if="${sortProperty.toString()} == 'name'">
                     <tr th:case="DESC">
-                        <th scope="col">Nom<a href="http://localhost:8080/artists?page=0&amp;size=10&amp;sortDirection=ASC&amp;sortProperty=name"><span class="glyphicon glyphicon-chevron-up"></span></a></th>
+                        <th scope="col">Nom<a th:href="@{/artists(name=${name},page=${pageNumber},size=${size},sortDirection='ASC',sortProperty=${sortProperty})}"><span class="glyphicon glyphicon-chevron-up"></span></a></th>
                         <th scope="col"></th>
                     </tr>
                     <tr th:case="ASC">
-                        <th scope="col">Nom<a href="http://localhost:8080/artists?page=0&amp;size=10&amp;sortDirection=DESC&amp;sortProperty=name"><span class="glyphicon glyphicon-chevron-down"></span></a></th>
+                        <th scope="col">Nom<a th:href="@{/artists(name=${name},page=${pageNumber},size=${size},sortDirection='DESC',sortProperty=${sortProperty})}"><span class="glyphicon glyphicon-chevron-down"></span></a></th>
                         <th scope="col"></th>
                     </tr>
                     </thead>

@@ -14,8 +14,13 @@
                 <div class="form-group">
                     <label for="name" class="form-control-label">Nom</label>
                     <input type="text" name="name" id="name" th:value="${artist.name}" class="ember-text-field form-control ember-view">
+                </div>
+            </div>
+        </form>
 
-
+        <form th:action="'/albums/'+${artist.id}" method="post" class="row">
+        <div class="col-lg-12">
+            <div class="form-group">
                     <label class="form-control-label">Albums</label>
                     <div class="row">
                         <div class="col-lg-10">
@@ -25,7 +30,7 @@
                         </div>
                         <div class="col-lg-2 text-center">
                             <div class="list-group text-center">
-                                <a th:each="albums : ${artist.albums}" class="btn-danger list-group-item list-group-item-action"><span class="glyphicon glyphicon-remove"></span></a>
+                                <a th:each="albums : ${artist.albums}" th:href="'/albums/'+${albums.id}+'/delete'" class="btn-danger list-group-item list-group-item-action"><span class="glyphicon glyphicon-remove"></span></a>
                             </div>
                         </div>
                     </div>
@@ -34,8 +39,7 @@
                             <input type="text" name="title" id="title" placeholder="Ajouter un album..." class="form-control ember-text-field ember-view">
                         </div>
                         <div class="col-lg-2 text-center">
-                            <button class="btn-success list-group-item list-group-item-action"><span class="glyphicon glyphicon-plus"></span></button>
-
+                            <button type="submit" class="btn-success list-group-item list-group-item-action"><span class="glyphicon glyphicon-plus"></span></button>
                         </div>
                     </div>
                 </div>
