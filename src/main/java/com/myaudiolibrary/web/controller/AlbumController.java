@@ -36,8 +36,10 @@ public class AlbumController {
     // Suppression d'un album
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/delete")
     public RedirectView deleteAlbum(@PathVariable Integer id){
+        Optional<Album> optionalAlbum = albumRepository.findById(id);
+        Integer idArtist = optionalAlbum.get().getArtist().getId();
         albumRepository.deleteById(id);
-        return new RedirectView("/artists?page=0&size=10&sortProperty=name&sortDirection=ASC");
+        return new RedirectView("/artists/" + idArtist);
     }
 
 }

@@ -78,7 +78,6 @@ public class ArtistController {
     }
 
     // CREATION, MODIFICATION & SUPPRESSION
-    // VOIR GESTION DES ERREURS
 
     @RequestMapping(method= RequestMethod.GET, value = "/new")
     public String newArtist(final ModelMap model){
